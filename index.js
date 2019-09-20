@@ -111,24 +111,44 @@ async function writeAllReposToFile(reposFilePath) {
 async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
   const repos = JSON.parse(fs.readFileSync(filePath).toString());
   let count = 1;
+  const batchSize = 5;
+  let batchRepos = [];
   let allRepoPageContents = [];
-  for (let repo of repos) {
+  for (let i = 0; i < repos.length; ++i) {
+    const repo = repos[i];
     const repoName = repo.name || '';
     let repoUrl = repo.url;
-
-    if (!repoUrl) {
-      return;
+    if (!repoUrl || !repoName) {
+      break;
     }
-    console.log(`start crawling page content No.${count} name ${repoName}`);
+    batchRepos.push(repo);
     ++count;
-    x(repoUrl, 'div.repository-content', [
-      { title: '.f4', readme: 'div.Box-body' },
-    ]).then((data, url) => {
-      allRepoPageContents.push(data);
-      return true;
-    });
-    await wait(200);
+
+    if ((i + 1) % 5 === 0 || i === repos.length - 1) {
+      console.log(
+        `start crawling page content No.${
+          count - batchSize <= 0 ? 1 : count - batchSize
+        }-${count - 1}  ${batchRepos.reduce((accu, repo) => {
+          accu += `${repo.name},`;
+          return accu;
+        }, '')}`,
+      );
+      await Promise.all(
+        batchRepos.map(repo => {
+          return x(repoUrl, 'div.repository-content', [
+            { title: '.f4', readme: 'div.Box-body' },
+          ]).then((data, url) => {
+            allRepoPageContents.push(data);
+            return true;
+          });
+        }),
+      );
+    }
+    // await wait(200);
   }
-  fs.writeFileSync(pageContetFilePath, JSON.stringify(allRepoPageContents));
+  fs.writeFileSync(
+    pageContetFilePath,
+    JSON.stringify(allRepoPageContents).replace(/\\n/gi, ' '),
+  );
   console.log(`saved file to ${pageContetFilePath}`);
 }
