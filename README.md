@@ -16,8 +16,11 @@ I need to search repos I added star before but github didn't provide this filter
 
 `$npm run search 'YOURKEYWORD'`
 
-example: `$npm run search 'express'`
-example: `$npm run search 'The original author of Express'`
+examples: 
+
+`$npm run search 'express'`
+
+`$npm run search 'The original author of Express'`
 
 if you have stared [express](https://github.com/expressjs/express), it would find some results.
 

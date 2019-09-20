@@ -19,7 +19,7 @@ if (!githubPersonalAccessToken) {
   );
 }
 (async () => {
-  // await writeAllReposToFile(reposFilePath);
+  await writeAllReposToFile(reposFilePath);
   await readFromFileAndParseToReadme(reposFilePath, pageContetFilePath);
 })();
 
