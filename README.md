@@ -27,4 +27,4 @@ public_repo permission required only
 
 ## TODOS
 
-- [ ] global CLI for easier usage: `$npm i -g starsearch`,`$starsearch crawl`,`$starsearch express`
+- [ ] global CLI for easier usage: `$npm i -g starsearch`,`$starsearch`,`$starsearch express`
