@@ -4,7 +4,9 @@ I need to search repos I added star before but github didn't provide this filter
 
 ## Usage
 
-Apply for github personal access token from `https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line`. Rename `.env.example` file to `.env` and Add token to `.env` file.
+1. Apply for github personal access token from `https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line`. 
+2. Rename `.env.example` file to `.env`  
+3. Replace GITGUB_PERSONAL_ACCESS_TOKEN in `.env` file by your valid token .
 
 ### collect repo data and save
 
@@ -20,7 +22,7 @@ example: `$npm run search express`
 
 ## Github personal access token permission 
 
-public_repo permission required only
+`public_repo` permission required only
 
 ![github-token](screenshots/github-personal-access-token-auth.png)
 
