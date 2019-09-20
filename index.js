@@ -112,7 +112,7 @@ async function writeAllReposToFile(reposFilePath) {
 async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
   const repos = JSON.parse(fs.readFileSync(filePath).toString());
   let count = 1;
-  const batchSize = +process.env.REQUEST_BATCH_SIZE || 10;
+  const batchSize = +process.env.REQUEST_BATCH_SIZE || 5;
   let batchRepos = [];
   let allRepoPageContents = [];
   for (let i = 0; i < repos.length; ++i) {
@@ -160,7 +160,7 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
         }),
       );
       batchRepos = [];
-      await wait(200);
+      await wait(500);
     }
   }
   fs.writeFileSync(pageContetFilePath, JSON.stringify(allRepoPageContents));

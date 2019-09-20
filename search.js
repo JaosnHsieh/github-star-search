@@ -56,8 +56,8 @@ db.serialize(() => {
       }
 
       rows.map(row => {
-        console.log(`name:${row.name}`);
-        console.log(`url:${row.url}\n`);
+        console.log(`name: ${row.name}`);
+        console.log(`url: ${row.url}\n`);
       });
       console.log(
         `${rows.length} results found!!\nkeyword: '${keyword}' in url, name, description, readme`,

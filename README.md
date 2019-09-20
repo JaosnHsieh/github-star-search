@@ -14,9 +14,13 @@ I need to search repos I added star before but github didn't provide this filter
 
 ### search repo data by text
 
-`$npm run search YOURKEYWORD`
+`$npm run search 'YOURKEYWORD'`
 
-example: `$npm run search express`
+example: `$npm run search 'express'`
+example: `$npm run search 'The original author of Express'`
+
+if you have stared [express](https://github.com/expressjs/express), it would find some results.
+
 
 
 
