@@ -7,9 +7,11 @@ const x = require('x-ray')();
 
 //https://developer.github.com/v4/guides/using-the-explorer/
 
-const githubPersonalAccessToken = process.env.GITGUB_PERSONAL_ACCESS_TOKEN;
-const reposFilePath = process.env.REPOS_FILE_PATH || path.join(__dirname, 'repos.json');
-const pageContetFilePath = process.env.PAGE_CONTENT_FILE_PATH || path.join(__dirname, 'pages.json');
+const githubPersonalAccessToken = process.env.GITHUB_PERSONAL_ACCESS_TOKEN;
+const reposFilePath =
+  process.env.REPOS_FILE_PATH || path.join(__dirname, 'repos.json');
+const pageContetFilePath =
+  process.env.PAGE_CONTENT_FILE_PATH || path.join(__dirname, 'pages.json');
 
 if (!githubPersonalAccessToken) {
   throw new Error(
@@ -38,7 +40,7 @@ async function writeAllReposToFile(reposFilePath) {
         method: 'POST', // *GET, POST, PUT, DELETE, etc.
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${GITHUB}`,
+          Authorization: `Bearer ${githubPersonalAccessToken}`,
           // 'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: JSON.stringify({
@@ -75,8 +77,16 @@ async function writeAllReposToFile(reposFilePath) {
         }
        */
       const data = await res.json();
-      const starredRepositories = _get(data, 'data.viewer.starredRepositories', {});
-      const hasNextPage = _get(starredRepositories, 'pageInfo.hasNextPage', false);
+      const starredRepositories = _get(
+        data,
+        'data.viewer.starredRepositories',
+        {},
+      );
+      const hasNextPage = _get(
+        starredRepositories,
+        'pageInfo.hasNextPage',
+        false,
+      );
       const endCursor = _get(starredRepositories, 'pageInfo.endCursor', '');
       const nodes = _get(starredRepositories, 'nodes', []);
       allRepos = allRepos.concat(nodes);
@@ -111,12 +121,12 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
     }
     console.log(`start crawling page content No.${count} name ${repoName}`);
     ++count;
-    x(repoUrl, 'div.repository-content', [{ title: '.f4', readme: 'div.Box-body' }]).then(
-      (data, url) => {
-        allRepoPageContents.push(data);
-        return true;
-      },
-    );
+    x(repoUrl, 'div.repository-content', [
+      { title: '.f4', readme: 'div.Box-body' },
+    ]).then((data, url) => {
+      allRepoPageContents.push(data);
+      return true;
+    });
     await wait(200);
   }
   fs.writeFileSync(pageContetFilePath, JSON.stringify(allRepoPageContents));
