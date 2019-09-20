@@ -1,12 +1,22 @@
+require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const fetch = require('isomorphic-fetch');
 const _get = require('lodash/get');
 const x = require('x-ray')();
 
+//https://developer.github.com/v4/guides/using-the-explorer/
+
+const githubPersonalAccessToken = process.env.GITGUB_PERSONAL_ACCESS_TOKEN;
+const reposFilePath = process.env.REPOS_FILE_PATH || path.join(__dirname, 'repos.json');
+const pageContetFilePath = process.env.PAGE_CONTENT_FILE_PATH || path.join(__dirname, 'pages.json');
+
+if (!githubPersonalAccessToken) {
+  throw new Error(
+    'github personal access token requried!! https://developer.github.com/v4/guides/using-the-explorer/',
+  );
+}
 (async () => {
-  const reposFilePath = path.join(__dirname, 'repos.json');
-  const pageContetFilePath = path.join(__dirname, 'pages.json');
   await writeAllReposToFile(reposFilePath);
   await readFromFileAndParseToReadme(reposFilePath, pageContetFilePath);
 })();
@@ -19,7 +29,7 @@ function wait(ms = 500) {
   );
 }
 
-async function writeAllReposToFile() {
+async function writeAllReposToFile(reposFilePath) {
   let allRepos = [];
   // 100 is the API limit of each request
   const getReposBatch = async (afterCursor = '', first = 100) => {
@@ -28,7 +38,7 @@ async function writeAllReposToFile() {
         method: 'POST', // *GET, POST, PUT, DELETE, etc.
         headers: {
           'Content-Type': 'application/json',
-          Authorization: 'Bearer f60284300d2ad46be1f44dec9c7518c08dd7787e',
+          Authorization: `Bearer ${GITHUB}`,
           // 'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: JSON.stringify({
@@ -84,13 +94,13 @@ async function writeAllReposToFile() {
     }
   };
   await getReposBatch();
-  fs.writeFileSync(filePath, JSON.stringify(allRepos));
-  console.log(`saved file to ${filePath}`);
+  fs.writeFileSync(reposFilePath, JSON.stringify(allRepos));
+  console.log(`saved file to ${reposFilePath}`);
 }
 
 async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
   const repos = JSON.parse(fs.readFileSync(filePath).toString());
-  let count = 0;
+  let count = 1;
   let allRepoPageContents = [];
   for (let repo of repos) {
     const repoName = repo.name || '';
@@ -99,7 +109,7 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
     if (!repoUrl) {
       return;
     }
-    console.log(`start getting No.${count} name ${repoName}`);
+    console.log(`start crawling page content No.${count} name ${repoName}`);
     ++count;
     x(repoUrl, 'div.repository-content', [{ title: '.f4', readme: 'div.Box-body' }]).then(
       (data, url) => {
@@ -107,7 +117,7 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
         return true;
       },
     );
-    await wait();
+    await wait(200);
   }
   fs.writeFileSync(pageContetFilePath, JSON.stringify(allRepoPageContents));
   console.log(`saved file to ${pageContetFilePath}`);
