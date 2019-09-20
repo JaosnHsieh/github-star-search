@@ -2,7 +2,7 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 const fetch = require('isomorphic-fetch');
-const _get = require('lodash/get');
+const _get = require('lodash.get');
 const x = require('x-ray')();
 
 //https://developer.github.com/v4/guides/using-the-explorer/
