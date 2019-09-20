@@ -1,11 +1,14 @@
 {
-  "name": "x-ray-github-depedency-crawler",
+  "name": "github-star-search",
   "version": "1.0.0",
   "description": "",
+  "engines": {
+    "node": ">=8.0.0"
+  },
   "main": "index.js",
   "scripts": {
     "start": "node ./index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "search": "node ./search.js"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +17,8 @@
     "dotenv": "^8.1.0",
     "isomorphic-fetch": "^2.2.1",
     "lodash": "^4.17.15",
+    "lodash.chunk": "^4.2.0",
+    "sqlite3": "^4.1.0",
     "x-ray": "^2.3.4"
   }
 }

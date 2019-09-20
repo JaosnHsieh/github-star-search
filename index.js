@@ -90,15 +90,16 @@ async function writeAllReposToFile(reposFilePath) {
       const endCursor = _get(starredRepositories, 'pageInfo.endCursor', '');
       const nodes = _get(starredRepositories, 'nodes', []);
       allRepos = allRepos.concat(nodes);
-      console.log('allRepos.length', allRepos.length);
+      console.log('stared repositories count', allRepos.length);
       await wait();
 
       if (hasNextPage) {
         await getReposBatch(endCursor);
-      } else {
-        //for debug
-        console.log('when !hasNextPage data', data);
       }
+      // else {
+      //   //for debug
+      //   console.log('when !hasNextPage data', data);
+      // }
     } catch (err) {
       console.error(err);
     }
@@ -111,7 +112,7 @@ async function writeAllReposToFile(reposFilePath) {
 async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
   const repos = JSON.parse(fs.readFileSync(filePath).toString());
   let count = 1;
-  const batchSize = 5;
+  const batchSize = +process.env.REQUEST_BATCH_SIZE || 10;
   let batchRepos = [];
   let allRepoPageContents = [];
   for (let i = 0; i < repos.length; ++i) {
@@ -124,31 +125,44 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
     batchRepos.push(repo);
     ++count;
 
-    if ((i + 1) % 5 === 0 || i === repos.length - 1) {
+    if ((i + 1) % batchSize === 0 || i === repos.length - 1) {
       console.log(
-        `start crawling page content No.${
+        `Crawling page content No.${
           count - batchSize <= 0 ? 1 : count - batchSize
         }-${count - 1}  ${batchRepos.reduce((accu, repo) => {
-          accu += `${repo.name},`;
+          accu += `${repo.name} ${repo.url}\n`;
           return accu;
-        }, '')}`,
+        }, '\n')}`,
       );
       await Promise.all(
         batchRepos.map(repo => {
-          return x(repoUrl, 'div.repository-content', [
-            { title: '.f4', readme: 'div.Box-body' },
-          ]).then((data, url) => {
-            allRepoPageContents.push(data);
-            return true;
-          });
+          return x(repo.url, 'div.repository-content', [
+            { description: '.f4', readme: 'div.Box-body' },
+          ])
+            .then((data, url) => {
+              if (Array.isArray(data)) {
+                data = data[0];
+                data &&
+                  data.readme &&
+                  typeof data.readme === 'string' &&
+                  (data.readme = data.readme.replace(/\n/gi, ' '));
+                data = {
+                  ...data,
+                  url: repo.url,
+                  name: repo.name,
+                };
+                allRepoPageContents.push(data);
+              }
+            })
+            .catch(err => {
+              console.log('cralwer error', repo.url, err);
+            });
         }),
       );
+      batchRepos = [];
+      await wait(200);
     }
-    // await wait(200);
   }
-  fs.writeFileSync(
-    pageContetFilePath,
-    JSON.stringify(allRepoPageContents).replace(/\\n/gi, ' '),
-  );
+  fs.writeFileSync(pageContetFilePath, JSON.stringify(allRepoPageContents));
   console.log(`saved file to ${pageContetFilePath}`);
 }
