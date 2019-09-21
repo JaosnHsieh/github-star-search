@@ -1,6 +1,6 @@
 ## Motivation
 
-I need to search repos I added star before but github didn't provide this filter.
+I need to search repos' README text I added star before but github didn't provide this filter.
 
 ## Usage
 
