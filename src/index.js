@@ -91,7 +91,7 @@ async function writeAllReposToFile(reposFilePath, token) {
         }
        */
       const data = await res.json();
-      if (_get(data, 'message:') === 'Bad credentials') {
+      if (_get(data, 'message', '') === 'Bad credentials') {
         throw new Error('Bad credentials');
       }
       const starredRepositories = _get(
@@ -107,23 +107,19 @@ async function writeAllReposToFile(reposFilePath, token) {
       const endCursor = _get(starredRepositories, 'pageInfo.endCursor', '');
       const nodes = _get(starredRepositories, 'nodes', []);
       allRepos = allRepos.concat(nodes);
-      console.log('stared repositories count', allRepos.length);
+      console.log('Stared repositories count', allRepos.length);
       await wait();
 
       if (hasNextPage) {
         await getReposBatch(endCursor);
       }
-      // else {
-      //   //for debug
-      //   console.log('when !hasNextPage data', data);
-      // }
     } catch (err) {
       console.error(err);
     }
   };
   await getReposBatch();
   fs.writeFileSync(reposFilePath, JSON.stringify(allRepos));
-  console.log(`saved file to ${reposFilePath}`);
+  console.log(`Saved file to ${reposFilePath}`);
 }
 
 async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
@@ -173,7 +169,7 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
             })
             .catch(err => {
               console.log(
-                `retry one more time due to request error ${repo.url}`,
+                `Retry one more time due to request error ${repo.url}`,
               );
               if (err) {
                 return x(repo.url, 'div.repository-content', [
@@ -183,7 +179,7 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
             })
             .catch(err => {
               if (err) {
-                console.log('2nd time request error', repo.url, err);
+                console.log('Request error 2nd time ', repo.url, err);
               }
             });
         }),
@@ -193,5 +189,6 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
     }
   }
   fs.writeFileSync(pageContetFilePath, JSON.stringify(allRepoPageContents));
-  console.log(`saved file to ${pageContetFilePath}`);
+  console.log(`Saved file to ${pageContetFilePath}`);
+  console.log(`Try search by "star-search search --keyword 'express'"`);
 }

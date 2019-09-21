@@ -1,6 +1,6 @@
 {
   "name": "@jasonhsieh/star-search",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Search your github stared repos by repo's README.md content.",
   "engines": {
     "node": ">=8.0.0"
