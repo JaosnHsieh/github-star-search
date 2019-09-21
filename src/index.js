@@ -175,11 +175,12 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
               if (err) {
                 return x(repo.url, 'div.repository-content', [
                   { description: '.f4', readme: 'div.Box-body' },
-                ]).catch(err => {
-                  if (err) {
-                    console.log('2nd time request error', repo.url, err);
-                  }
-                });
+                ]);
+              }
+            })
+            .catch(err => {
+              if (err) {
+                console.log('2nd time request error', repo.url, err);
               }
             });
         }),
