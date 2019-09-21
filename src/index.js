@@ -1,27 +1,41 @@
-require('dotenv').config();
+const fire = require('js-fire');
 const fs = require('fs');
 const path = require('path');
 const fetch = require('isomorphic-fetch');
 const _get = require('lodash.get');
 const x = require('x-ray')();
+const search = require('./search');
+const {
+  githubPersonalAccessToken,
+  reposFilePath,
+  pageContetFilePath,
+} = require('./env');
 
-//https://developer.github.com/v4/guides/using-the-explorer/
+const starsearch = {
+  __description__: 'search your github stared repos with ease.',
+  start: async token => {
+    if (!githubPersonalAccessToken && !token) {
+      throw new Error(
+        `github personal access token requried!\n
+        star-search start --token=<token>
+        https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line`,
+      );
+    }
+    if (token) {
+      fs.writeFileSync(
+        path.join(__dirname, '..', '.env'),
+        `GITHUB_PERSONAL_ACCESS_TOKEN=${token}`,
+      );
+    }
+    await writeAllReposToFile(reposFilePath, token);
+    await readFromFileAndParseToReadme(reposFilePath, pageContetFilePath);
+  },
+  search: keyword => {
+    search(keyword);
+  },
+};
 
-const githubPersonalAccessToken = process.env.GITHUB_PERSONAL_ACCESS_TOKEN;
-const reposFilePath =
-  process.env.REPOS_FILE_PATH || path.join(__dirname, 'repos.json');
-const pageContetFilePath =
-  process.env.PAGE_CONTENT_FILE_PATH || path.join(__dirname, 'pages.json');
-
-if (!githubPersonalAccessToken) {
-  throw new Error(
-    'github personal access token requried!! https://developer.github.com/v4/guides/using-the-explorer/',
-  );
-}
-(async () => {
-  await writeAllReposToFile(reposFilePath);
-  await readFromFileAndParseToReadme(reposFilePath, pageContetFilePath);
-})();
+fire(starsearch);
 
 function wait(ms = 500) {
   return new Promise(resolve =>
@@ -31,7 +45,7 @@ function wait(ms = 500) {
   );
 }
 
-async function writeAllReposToFile(reposFilePath) {
+async function writeAllReposToFile(reposFilePath, token) {
   let allRepos = [];
   // 100 is the API limit of each request
   const getReposBatch = async (afterCursor = '', first = 100) => {
@@ -40,7 +54,7 @@ async function writeAllReposToFile(reposFilePath) {
         method: 'POST', // *GET, POST, PUT, DELETE, etc.
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${githubPersonalAccessToken}`,
+          Authorization: `Bearer ${githubPersonalAccessToken || token}`,
           // 'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: JSON.stringify({
@@ -112,7 +126,7 @@ async function writeAllReposToFile(reposFilePath) {
 async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
   const repos = JSON.parse(fs.readFileSync(filePath).toString());
   let count = 1;
-  const batchSize = +process.env.REQUEST_BATCH_SIZE || 5;
+  const batchSize = +process.env.REQUEST_BATCH_SIZE || 10;
   let batchRepos = [];
   let allRepoPageContents = [];
   for (let i = 0; i < repos.length; ++i) {

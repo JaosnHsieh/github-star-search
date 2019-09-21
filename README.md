@@ -4,42 +4,38 @@ I need to search repos I added star before but github didn't provide this filter
 
 ## Usage
 
-1. Apply for github personal access token from `https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line`. 
-2. Rename `.env.example` file to `.env`  
-3. Replace GITGUB_PERSONAL_ACCESS_TOKEN in `.env` file by your valid token .
-
-### collect repo data and save
-
-`$npm start`
-
-### search repo data by sqlite full text search
-
-`$npm run search 'YOURKEYWORD'`
-
-sqlite [FTS5](https://www.sqlitetutorial.net/sqlite-full-text-search/)
-
-query examples: 
-
-`$npm run search 'express'`
-
-`$npm run search 'express node'`
-
-`$npm run search 'expre*'`
-
-`$npm run search 'express AND node'`
-
-`$npm run search 'express NOT node'`
-
-`$npm run search 'express OR node'`
+1. Apply for github personal access token from [github](https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line). 
+2. `$npm i -g @jasonhsieh/star-search`
+3. `$star-search start --token=YOURACCESSTOKEN`
+4. `$star-search search --keyword='express'`  
 
 
-## Github personal access token permission 
+## Query examples
+
+`$$star-search search --keyword 'YOURKEYWORD'`
+
+full text search powered by sqlite [FTS5](https://www.sqlitetutorial.net/sqlite-full-text-search/)
+
+`$star-search search --keyword 'express'`
+
+`$star-search search --keyword 'express node'`
+
+`$star-search search --keyword 'expre*'`
+
+`$star-search search --keyword 'express AND node'`
+
+`$star-search search --keyword 'express NOT node'`
+
+`$star-search search --keyword 'express OR node'`
+
+
+### Github personal access token permission 
 
 `public_repo` permission required only
 
 ![github-token](screenshots/github-personal-access-token-auth.png)
 
 
-## TODOS
+### TODOS
 
-- [ ] global CLI for easier usage: `$npm i -g starsearch`,`$starsearch`,`$starsearch express`
+- [x] global CLI for easier usage: `$npm i -g starsearch`,`$starsearch`,`$starsearch express`
