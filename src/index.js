@@ -91,6 +91,9 @@ async function writeAllReposToFile(reposFilePath, token) {
         }
        */
       const data = await res.json();
+      if (_get(data, 'message:') === 'Bad credentials') {
+        throw new Error('Bad credentials');
+      }
       const starredRepositories = _get(
         data,
         'data.viewer.starredRepositories',
