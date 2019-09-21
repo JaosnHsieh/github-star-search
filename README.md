@@ -12,19 +12,25 @@ I need to search repos I added star before but github didn't provide this filter
 
 `$npm start`
 
-### search repo data by text
+### search repo data by sqlite full text search
 
 `$npm run search 'YOURKEYWORD'`
 
-examples: 
+sqlite [FTS5](https://www.sqlitetutorial.net/sqlite-full-text-search/)
+
+query examples: 
 
 `$npm run search 'express'`
 
-`$npm run search 'The original author of Express'`
+`$npm run search 'express node'`
 
-if you have stared [express](https://github.com/expressjs/express), it would find some results.
+`$npm run search 'expre*'`
 
+`$npm run search 'express AND node'`
 
+`$npm run search 'express NOT node'`
+
+`$npm run search 'express OR node'`
 
 
 ## Github personal access token permission 

@@ -20,7 +20,7 @@ let db = new sqlite3.Database(':memory:', err => {
  */
 db.serialize(() => {
   db.run(
-    'CREATE TABLE pages(name text, url text, description text, readme text)',
+    `CREATE VIRTUAL TABLE pages USING FTS5(name, url, description, readme);`,
   );
   /**
    * chuck due to error caused by SQLITE_MAX_VARIABLE_NUMBER
@@ -49,7 +49,7 @@ db.serialize(() => {
     return console.log('no keyword found. example: npm run search express');
   }
   db.all(
-    `SELECT url,name FROM pages WHERE url LIKE '%${keyword}%' OR name LIKE '%${keyword}%' OR description LIKE '%${keyword}%' OR readme LIKE '%${keyword}%'`,
+    `SELECT url,name FROM pages WHERE pages match '${keyword}'`,
     (err, rows) => {
       if (err) {
         throw err;
@@ -62,7 +62,6 @@ db.serialize(() => {
       console.log(
         `${rows.length} results found!!\nkeyword: '${keyword}' in url, name, description, readme`,
       );
-      console.log(``);
     },
   );
 });
