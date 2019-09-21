@@ -54,7 +54,7 @@ async function writeAllReposToFile(reposFilePath, token) {
         method: 'POST', // *GET, POST, PUT, DELETE, etc.
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${githubPersonalAccessToken || token}`,
+          Authorization: `Bearer ${token || githubPersonalAccessToken}`,
           // 'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: JSON.stringify({
