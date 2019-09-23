@@ -4,6 +4,7 @@ const path = require('path');
 const fetch = require('isomorphic-fetch');
 const _get = require('lodash.get');
 const { Signale } = require('signale');
+const signale = new Signale({ scope: 'star-search' });
 const interactive = new Signale({ interactive: true, scope: 'star-search' });
 const x = require('x-ray')().timeout(5000);
 const search = require('./search');
@@ -96,9 +97,9 @@ async function writeAllReposToFile(reposFilePath, token) {
       const nodes = _get(starredRepositories, 'nodes', []);
       allRepos = allRepos.concat(nodes);
 
-      interactive.await(`Star repositories [%d/%d]`, allRepos.length, totalCount);
+      interactive.await(`Fetching Star repositories [%d/%d]`, allRepos.length, totalCount);
       if (allRepos.length === totalCount) {
-        interactive.success(`Star repositories [%d/%d]`, allRepos.length, totalCount);
+        interactive.success(`Fetching Star repositories [%d/%d]`, allRepos.length, totalCount);
       }
 
       await wait();
@@ -107,12 +108,12 @@ async function writeAllReposToFile(reposFilePath, token) {
         await getReposBatch(endCursor);
       }
     } catch (err) {
-      console.error(err);
+      signale.error(err);
     }
   };
   await getReposBatch();
   fs.writeFileSync(reposFilePath, JSON.stringify(allRepos));
-  console.log(`Saved file to ${reposFilePath}`);
+  signale.complete(`Saved file to ${reposFilePath}`);
 }
 
 async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
@@ -198,7 +199,7 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
           } catch (err) {
             ++retryCount;
             if (retryCount < retryNumbers) {
-              console.log(`network error, trying...${retryCount}`);
+              signale.info(`network error, trying...${retryCount}`);
               await xRequest(...args);
             }
           }
@@ -207,6 +208,6 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
     }
   }
   fs.writeFileSync(pageContetFilePath, JSON.stringify(allRepoPageContents));
-  console.log(`Saved file to ${pageContetFilePath}`);
-  console.log(`Try search by "star-search search --keyword 'express'"`);
+  signale.complete(`Saved file to ${pageContetFilePath}`);
+  signale.info(`Try search by "star-search search --keyword 'express'"`);
 }
