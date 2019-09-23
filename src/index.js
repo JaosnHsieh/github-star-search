@@ -3,13 +3,11 @@ const fs = require('fs');
 const path = require('path');
 const fetch = require('isomorphic-fetch');
 const _get = require('lodash.get');
-const x = require('x-ray')();
+const { Signale } = require('signale');
+const interactive = new Signale({ interactive: true, scope: 'star-search' });
+const x = require('x-ray')().timeout(5000);
 const search = require('./search');
-const {
-  githubPersonalAccessToken,
-  reposFilePath,
-  pageContetFilePath,
-} = require('./env');
+const { githubPersonalAccessToken, reposFilePath, pageContetFilePath } = require('./env');
 
 const starsearch = {
   __description__: 'search your github stared repos with ease.',
@@ -22,10 +20,7 @@ const starsearch = {
       );
     }
     if (token) {
-      fs.writeFileSync(
-        path.join(__dirname, '..', '.env'),
-        `GITHUB_PERSONAL_ACCESS_TOKEN=${token}`,
-      );
+      fs.writeFileSync(path.join(__dirname, '..', '.env'), `GITHUB_PERSONAL_ACCESS_TOKEN=${token}`);
     }
     await writeAllReposToFile(reposFilePath, token);
     await readFromFileAndParseToReadme(reposFilePath, pageContetFilePath);
@@ -94,20 +89,18 @@ async function writeAllReposToFile(reposFilePath, token) {
       if (_get(data, 'message', '') === 'Bad credentials') {
         throw new Error('Bad credentials, maybe wrong token');
       }
-      const starredRepositories = _get(
-        data,
-        'data.viewer.starredRepositories',
-        {},
-      );
-      const hasNextPage = _get(
-        starredRepositories,
-        'pageInfo.hasNextPage',
-        false,
-      );
+      const starredRepositories = _get(data, 'data.viewer.starredRepositories', {});
+      const totalCount = _get(starredRepositories, 'totalCount', 0);
+      const hasNextPage = _get(starredRepositories, 'pageInfo.hasNextPage', false);
       const endCursor = _get(starredRepositories, 'pageInfo.endCursor', '');
       const nodes = _get(starredRepositories, 'nodes', []);
       allRepos = allRepos.concat(nodes);
-      console.log('Stared repositories count', allRepos.length);
+
+      interactive.await(`Star repositories [%d/%d]`, allRepos.length, totalCount);
+      if (allRepos.length === totalCount) {
+        interactive.success(`Star repositories [%d/%d]`, allRepos.length, totalCount);
+      }
+
       await wait();
 
       if (hasNextPage) {
@@ -124,7 +117,7 @@ async function writeAllReposToFile(reposFilePath, token) {
 
 async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
   const repos = JSON.parse(fs.readFileSync(filePath).toString());
-  let count = 1;
+  let batchCount = 1;
   const batchSize = +process.env.REQUEST_BATCH_SIZE || 10;
   let batchRepos = [];
   let allRepoPageContents = [];
@@ -136,56 +129,81 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
       break;
     }
     batchRepos.push(repo);
-    ++count;
+    ++batchCount;
 
     if ((i + 1) % batchSize === 0 || i === repos.length - 1) {
-      console.log(
-        `Crawling page content No.${
-          count - batchSize <= 0 ? 1 : count - batchSize
-        }-${count - 1}  ${batchRepos.reduce((accu, repo) => {
-          accu += `${repo.name} ${repo.url}\n`;
-          return accu;
-        }, '\n')}`,
-      );
+      if (i === repos.length - 1) {
+        interactive.success(
+          `Crawling page content No. [%s/%d]`,
+          `${batchCount - batchSize <= 0 ? 1 : batchCount - batchSize}-${batchCount - 1}`,
+          repos.length,
+        );
+      } else {
+        interactive.await(
+          `Crawling page content No. [%s/%d]`,
+          `${batchCount - batchSize <= 0 ? 1 : batchCount - batchSize}-${batchCount - 1}`,
+          repos.length,
+        );
+      }
+
+      // console.log(
+      //   `Crawling page content No.${
+      //     batchCount - batchSize <= 0 ? 1 : batchCount - batchSize
+      //   }-${batchCount - 1}  ${batchRepos.reduce((accu, repo) => {
+      //     accu += `${repo.name} ${repo.url}\n`;
+      //     return accu;
+      //   }, '\n')}`,
+      // );
       await Promise.all(
         batchRepos.map(repo => {
-          return x(repo.url, 'div.repository-content', [
+          return xRequestRetry(repo.url, 'div.repository-content', [
             { description: '.f4', readme: 'div.Box-body' },
-          ])
-            .then((data, url) => {
-              if (Array.isArray(data)) {
-                data = data[0];
-                data &&
-                  data.readme &&
-                  typeof data.readme === 'string' &&
-                  (data.readme = data.readme.replace(/\n/gi, ' '));
-                data = {
-                  ...data,
-                  url: repo.url,
-                  name: repo.name,
-                };
-                allRepoPageContents.push(data);
-              }
-            })
-            .catch(err => {
-              console.log(
-                `Retry one more time due to request error ${repo.url}`,
-              );
-              if (err) {
-                return x(repo.url, 'div.repository-content', [
-                  { description: '.f4', readme: 'div.Box-body' },
-                ]);
-              }
-            })
-            .catch(err => {
-              if (err) {
-                console.log('Request error 2nd time ', repo.url, err);
-              }
-            });
+          ]);
         }),
       );
       batchRepos = [];
-      await wait(500);
+
+      async function xRequestRetry(...args) {
+        let retryNumbers = 5;
+        let retryCount = 1;
+
+        await xRequest();
+
+        async function xRequest() {
+          try {
+            if (retryCount >= retryNumbers) {
+              return allRepoPageContents.push({
+                url: repo.url,
+                name: repo.name,
+                description: 'network error',
+                readme: 'network error',
+              });
+            }
+
+            let data = await x(...args);
+
+            if (Array.isArray(data)) {
+              data = data[0];
+              data &&
+                data.readme &&
+                typeof data.readme === 'string' &&
+                (data.readme = data.readme.replace(/\n/gi, ' '));
+              data = {
+                ...data,
+                url: repo.url,
+                name: repo.name,
+              };
+              allRepoPageContents.push(data);
+            }
+          } catch (err) {
+            ++retryCount;
+            if (retryCount < retryNumbers) {
+              console.log(`network error, trying...${retryCount}`);
+              await xRequest(...args);
+            }
+          }
+        }
+      }
     }
   }
   fs.writeFileSync(pageContetFilePath, JSON.stringify(allRepoPageContents));
