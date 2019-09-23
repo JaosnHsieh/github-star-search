@@ -8,7 +8,11 @@ const signale = new Signale({ scope: 'star-search' });
 const interactive = new Signale({ interactive: true, scope: 'star-search' });
 const x = require('x-ray')().timeout(5000);
 const search = require('./search');
-const { githubPersonalAccessToken, reposFilePath, pageContetFilePath } = require('./env');
+const {
+  githubPersonalAccessToken,
+  reposFilePath,
+  pageContetFilePath
+} = require('./env');
 
 const starsearch = {
   __description__: 'search your github stared repos with ease.',
@@ -17,18 +21,21 @@ const starsearch = {
       throw new Error(
         `github personal access token requried!\n
         star-search start --token=<token>
-        https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line`,
+        https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line`
       );
     }
     if (token) {
-      fs.writeFileSync(path.join(__dirname, '..', '.env'), `GITHUB_PERSONAL_ACCESS_TOKEN=${token}`);
+      fs.writeFileSync(
+        path.join(__dirname, '..', '.env'),
+        `GITHUB_PERSONAL_ACCESS_TOKEN=${token}`
+      );
     }
-    await writeAllReposToFile(reposFilePath, token);
+    // await writeAllReposToFile(reposFilePath, token);
     await readFromFileAndParseToReadme(reposFilePath, pageContetFilePath);
   },
   search: keyword => {
     search(keyword);
-  },
+  }
 };
 
 fire(starsearch);
@@ -37,7 +44,7 @@ function wait(ms = 500) {
   return new Promise(resolve =>
     setTimeout(() => {
       resolve();
-    }, ms),
+    }, ms)
   );
 }
 
@@ -50,13 +57,13 @@ async function writeAllReposToFile(reposFilePath, token) {
         method: 'POST', // *GET, POST, PUT, DELETE, etc.
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token || githubPersonalAccessToken}`,
+          Authorization: `Bearer ${token || githubPersonalAccessToken}`
           // 'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: JSON.stringify({
           query: `{ viewer { starredRepositories(first:${first},${afterCursor &&
-            `after:"${afterCursor}"`} orderBy:{field:STARRED_AT,direction:ASC},){ pageInfo{ hasNextPage startCursor endCursor } nodes{ name url } totalCount } } }`,
-        }),
+            `after:"${afterCursor}"`} orderBy:{field:STARRED_AT,direction:ASC},){ pageInfo{ hasNextPage startCursor endCursor } nodes{ name url } totalCount } } }`
+        })
       });
 
       /**
@@ -90,16 +97,32 @@ async function writeAllReposToFile(reposFilePath, token) {
       if (_get(data, 'message', '') === 'Bad credentials') {
         throw new Error('Bad credentials, maybe wrong token');
       }
-      const starredRepositories = _get(data, 'data.viewer.starredRepositories', {});
+      const starredRepositories = _get(
+        data,
+        'data.viewer.starredRepositories',
+        {}
+      );
       const totalCount = _get(starredRepositories, 'totalCount', 0);
-      const hasNextPage = _get(starredRepositories, 'pageInfo.hasNextPage', false);
+      const hasNextPage = _get(
+        starredRepositories,
+        'pageInfo.hasNextPage',
+        false
+      );
       const endCursor = _get(starredRepositories, 'pageInfo.endCursor', '');
       const nodes = _get(starredRepositories, 'nodes', []);
       allRepos = allRepos.concat(nodes);
 
-      interactive.await(`Fetching Star repositories [%d/%d]`, allRepos.length, totalCount);
+      interactive.await(
+        `Fetching Star repositories [%d/%d]`,
+        allRepos.length,
+        totalCount
+      );
       if (allRepos.length === totalCount) {
-        interactive.success(`Fetching Star repositories [%d/%d]`, allRepos.length, totalCount);
+        interactive.success(
+          `Fetching Star repositories [%d/%d]`,
+          allRepos.length,
+          totalCount
+        );
       }
 
       await wait();
@@ -117,13 +140,16 @@ async function writeAllReposToFile(reposFilePath, token) {
 }
 
 async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
-  const repos = JSON.parse(fs.readFileSync(filePath).toString());
+  const allRepos = JSON.parse(fs.readFileSync(filePath).toString()).slice(
+    0,
+    20
+  );
   let batchCount = 1;
   const batchSize = +process.env.REQUEST_BATCH_SIZE || 10;
   let batchRepos = [];
   let allRepoPageContents = [];
-  for (let i = 0; i < repos.length; ++i) {
-    const repo = repos[i];
+  for (let i = 0; i < allRepos.length; ++i) {
+    const repo = allRepos[i];
     const repoName = repo.name || '';
     let repoUrl = repo.url;
     if (!repoUrl || !repoName) {
@@ -132,18 +158,22 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
     batchRepos.push(repo);
     ++batchCount;
 
-    if ((i + 1) % batchSize === 0 || i === repos.length - 1) {
-      if (i === repos.length - 1) {
+    if ((i + 1) % batchSize === 0 || i === allRepos.length - 1) {
+      if (i === allRepos.length - 1) {
         interactive.success(
           `Crawling page content No. [%s/%d]`,
-          `${batchCount - batchSize <= 0 ? 1 : batchCount - batchSize}-${batchCount - 1}`,
-          repos.length,
+          `${
+            batchCount - batchSize <= 0 ? 1 : batchCount - batchSize
+          }-${batchCount - 1}`,
+          allRepos.length
         );
       } else {
         interactive.await(
           `Crawling page content No. [%s/%d]`,
-          `${batchCount - batchSize <= 0 ? 1 : batchCount - batchSize}-${batchCount - 1}`,
-          repos.length,
+          `${
+            batchCount - batchSize <= 0 ? 1 : batchCount - batchSize
+          }-${batchCount - 1}`,
+          allRepos.length
         );
       }
 
@@ -157,14 +187,14 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
       // );
       await Promise.all(
         batchRepos.map(repo => {
-          return xRequestRetry(repo.url, 'div.repository-content', [
-            { description: '.f4', readme: 'div.Box-body' },
+          return xRequestRetry(repo, repo.url, 'div.repository-content', [
+            { description: '.f4', readme: 'div.Box-body' }
           ]);
-        }),
+        })
       );
       batchRepos = [];
 
-      async function xRequestRetry(...args) {
+      async function xRequestRetry(repo, ...args) {
         let retryNumbers = 5;
         let retryCount = 1;
 
@@ -177,7 +207,7 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
                 url: repo.url,
                 name: repo.name,
                 description: 'network error',
-                readme: 'network error',
+                readme: 'network error'
               });
             }
 
@@ -185,18 +215,24 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
 
             if (Array.isArray(data)) {
               data = data[0];
-              data &&
-                data.readme &&
-                typeof data.readme === 'string' &&
-                (data.readme = data.readme.replace(/\n/gi, ' '));
+              dataPropTrimOrEmpty(data, 'readme');
+              dataPropTrimOrEmpty(data, 'description');
+              function dataPropTrimOrEmpty(data, propName) {
+                data && data[propName] && typeof data[propName] === 'string'
+                  ? (data[propName] = data[propName].replace(/\n/gi, ' '))
+                  : (data[propName] = '');
+              }
+
               data = {
                 ...data,
                 url: repo.url,
-                name: repo.name,
+                name: repo.name
               };
               allRepoPageContents.push(data);
             }
           } catch (err) {
+            console.log(err);
+            await wait(2000);
             ++retryCount;
             if (retryCount < retryNumbers) {
               signale.info(`network error, trying...${retryCount}`);
