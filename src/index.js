@@ -11,7 +11,7 @@ const search = require('./search');
 const {
   githubPersonalAccessToken,
   reposFilePath,
-  pageContetFilePath
+  pageContetFilePath,
 } = require('./env');
 
 const starsearch = {
@@ -21,21 +21,21 @@ const starsearch = {
       throw new Error(
         `github personal access token requried!\n
         star-search start --token=<token>
-        https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line`
+        https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line`,
       );
     }
     if (token) {
       fs.writeFileSync(
         path.join(__dirname, '..', '.env'),
-        `GITHUB_PERSONAL_ACCESS_TOKEN=${token}`
+        `GITHUB_PERSONAL_ACCESS_TOKEN=${token}`,
       );
     }
-    // await writeAllReposToFile(reposFilePath, token);
+    await writeAllReposToFile(reposFilePath, token);
     await readFromFileAndParseToReadme(reposFilePath, pageContetFilePath);
   },
   search: keyword => {
     search(keyword);
-  }
+  },
 };
 
 fire(starsearch);
@@ -44,7 +44,7 @@ function wait(ms = 500) {
   return new Promise(resolve =>
     setTimeout(() => {
       resolve();
-    }, ms)
+    }, ms),
   );
 }
 
@@ -57,13 +57,13 @@ async function writeAllReposToFile(reposFilePath, token) {
         method: 'POST', // *GET, POST, PUT, DELETE, etc.
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token || githubPersonalAccessToken}`
+          Authorization: `Bearer ${token || githubPersonalAccessToken}`,
           // 'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: JSON.stringify({
           query: `{ viewer { starredRepositories(first:${first},${afterCursor &&
-            `after:"${afterCursor}"`} orderBy:{field:STARRED_AT,direction:ASC},){ pageInfo{ hasNextPage startCursor endCursor } nodes{ name url } totalCount } } }`
-        })
+            `after:"${afterCursor}"`} orderBy:{field:STARRED_AT,direction:ASC},){ pageInfo{ hasNextPage startCursor endCursor } nodes{ name url } totalCount } } }`,
+        }),
       });
 
       /**
@@ -100,13 +100,13 @@ async function writeAllReposToFile(reposFilePath, token) {
       const starredRepositories = _get(
         data,
         'data.viewer.starredRepositories',
-        {}
+        {},
       );
       const totalCount = _get(starredRepositories, 'totalCount', 0);
       const hasNextPage = _get(
         starredRepositories,
         'pageInfo.hasNextPage',
-        false
+        false,
       );
       const endCursor = _get(starredRepositories, 'pageInfo.endCursor', '');
       const nodes = _get(starredRepositories, 'nodes', []);
@@ -115,13 +115,13 @@ async function writeAllReposToFile(reposFilePath, token) {
       interactive.await(
         `Fetching Star repositories [%d/%d]`,
         allRepos.length,
-        totalCount
+        totalCount,
       );
       if (allRepos.length === totalCount) {
         interactive.success(
           `Fetching Star repositories [%d/%d]`,
           allRepos.length,
-          totalCount
+          totalCount,
         );
       }
 
@@ -142,7 +142,7 @@ async function writeAllReposToFile(reposFilePath, token) {
 async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
   const allRepos = JSON.parse(fs.readFileSync(filePath).toString()).slice(
     0,
-    20
+    20,
   );
   let batchCount = 1;
   const batchSize = +process.env.REQUEST_BATCH_SIZE || 10;
@@ -165,7 +165,7 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
           `${
             batchCount - batchSize <= 0 ? 1 : batchCount - batchSize
           }-${batchCount - 1}`,
-          allRepos.length
+          allRepos.length,
         );
       } else {
         interactive.await(
@@ -173,7 +173,7 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
           `${
             batchCount - batchSize <= 0 ? 1 : batchCount - batchSize
           }-${batchCount - 1}`,
-          allRepos.length
+          allRepos.length,
         );
       }
 
@@ -188,9 +188,9 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
       await Promise.all(
         batchRepos.map(repo => {
           return xRequestRetry(repo, repo.url, 'div.repository-content', [
-            { description: '.f4', readme: 'div.Box-body' }
+            { description: '.f4', readme: 'div.Box-body' },
           ]);
-        })
+        }),
       );
       batchRepos = [];
 
@@ -207,7 +207,7 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
                 url: repo.url,
                 name: repo.name,
                 description: 'network error',
-                readme: 'network error'
+                readme: 'network error',
               });
             }
 
@@ -226,7 +226,7 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
               data = {
                 ...data,
                 url: repo.url,
-                name: repo.name
+                name: repo.name,
               };
               allRepoPageContents.push(data);
             }
