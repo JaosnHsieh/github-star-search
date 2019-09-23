@@ -211,10 +211,10 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
             let data = await x(...args);
 
             if (Array.isArray(data)) {
-              data = data[0];
+              data = data[0] || {};
               dataPropTrimOrEmpty(data, 'readme');
               dataPropTrimOrEmpty(data, 'description');
-              function dataPropTrimOrEmpty(data, propName) {
+              function dataPropTrimOrEmpty(data = {}, propName = '') {
                 data && data[propName] && typeof data[propName] === 'string'
                   ? (data[propName] = data[propName].replace(/\n/gi, ' '))
                   : (data[propName] = '');
