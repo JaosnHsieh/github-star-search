@@ -140,10 +140,7 @@ async function writeAllReposToFile(reposFilePath, token) {
 }
 
 async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
-  const allRepos = JSON.parse(fs.readFileSync(filePath).toString()).slice(
-    0,
-    20,
-  );
+  const allRepos = JSON.parse(fs.readFileSync(filePath).toString());
   let batchCount = 1;
   const batchSize = +process.env.REQUEST_BATCH_SIZE || 10;
   let batchRepos = [];
