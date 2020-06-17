@@ -32,11 +32,12 @@
   "dependencies": {
     "dotenv": "^8.1.0",
     "isomorphic-fetch": "^2.2.1",
-    "js-fire": "^0.5.0",
+    "js-fire": "^0.7.3",
+    "js-search": "^2.0.0",
     "lodash.chunk": "^4.2.0",
     "lodash.get": "^4.4.2",
+    "porter-stemmer": "^0.9.1",
     "signale": "^1.4.0",
-    "sqlite3": "^4.1.0",
     "x-ray": "^2.3.4"
   }
 }
