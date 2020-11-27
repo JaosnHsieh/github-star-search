@@ -15,8 +15,8 @@ const {
 } = require('./env');
 
 const starsearch = {
-  __description__: 'search your github stared repos with ease.',
-  start: async token => {
+  __description__: 'Search your github stared repos with ease. Get token at https://github.com/settings/tokens with permission "public_repo"',
+  update: async token => {
     if (!githubPersonalAccessToken && !token) {
       throw new Error(
         `github personal access token requried!\n

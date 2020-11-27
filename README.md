@@ -1,36 +1,26 @@
-## Motivation
+## Feature
 
-I need to search repos' README text I clicked star but github didn't provide this filter.
+Search your star repositories on Github by `text in README`, `description` and `repo name` offline.
 
 ## Usage
 
 1. Apply for github personal access token from [github](https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line).
-2. `$npm i -g @jasonhsieh/star-search`
-3. `$star-search start --token=YOURACCESSTOKEN`
-4. `$star-search search --keyword='express'`
+2. `$ npm i -g @jasonhsieh/star-search`
+3. `$ star-search update --token=YOURACCESSTOKEN`
+4. `$ star-search search --keyword='express'`
 
 ## Query examples
 
-`$$star-search search --keyword 'YOURKEYWORD'`
+`$ star-search search --keyword 'express'`
 
-`$star-search search --keyword 'express'`
+`$ star-search search --keyword 'express node'`
 
-`$star-search search --keyword 'express node'`
-
-`$star-search search --keyword 'expre*'`
-
-`$star-search search --keyword 'express AND node'`
-
-`$star-search search --keyword 'express NOT node'`
-
-`$star-search search --keyword 'express OR node'`
-
-### Github personal access token permission
+## Github personal access token permission
 
 `public_repo` permission required only
 
 ![github-token](screenshots/github-personal-access-token-auth.png)
 
-### TODOS
+## Search powered by js-search AllSubstringsIndexStrategy
 
-- [x] global CLI for easier usage: `$npm i -g starsearch`,`$starsearch`,`$starsearch express`
+https://github.com/bvaughn/js-search#configuring-the-index-strategy

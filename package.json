@@ -1,7 +1,7 @@
 {
   "name": "@jasonhsieh/star-search",
-  "version": "0.0.18",
-  "description": "Search your github stared repos by repo's README.md content.",
+  "version": "0.0.19",
+  "description": "Search your star repositories on Github by text in README, description and repo name offline.",
   "homepage": "https://github.com/JaosnHsieh/github-star-search",
   "engines": {
     "node": ">=8.0.0"
