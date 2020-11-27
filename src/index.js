@@ -6,7 +6,7 @@ const _get = require('lodash.get');
 const { Signale } = require('signale');
 const signale = new Signale({ scope: 'star-search' });
 const interactive = new Signale({ interactive: true, scope: 'star-search' });
-const x = require('x-ray')().timeout(5000);
+const x = require('x-ray')().timeout(8000);
 const search = require('./search');
 const {
   githubPersonalAccessToken,
@@ -15,8 +15,9 @@ const {
 } = require('./env');
 
 const starsearch = {
-  __description__: 'Search your github stared repos with ease. Get token at https://github.com/settings/tokens with permission "public_repo"',
-  update: async token => {
+  __description__:
+    'Search your github stared repos with ease. Get token at https://github.com/settings/tokens with permission "public_repo"',
+  update: async (token) => {
     if (!githubPersonalAccessToken && !token) {
       throw new Error(
         `github personal access token requried!\n
@@ -33,7 +34,7 @@ const starsearch = {
     await writeAllReposToFile(reposFilePath, token);
     await readFromFileAndParseToReadme(reposFilePath, pageContetFilePath);
   },
-  search: keyword => {
+  search: (keyword) => {
     search(keyword);
   },
 };
@@ -41,7 +42,7 @@ const starsearch = {
 fire(starsearch);
 
 function wait(ms = 500) {
-  return new Promise(resolve =>
+  return new Promise((resolve) =>
     setTimeout(() => {
       resolve();
     }, ms),
@@ -61,8 +62,9 @@ async function writeAllReposToFile(reposFilePath, token) {
           // 'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: JSON.stringify({
-          query: `{ viewer { starredRepositories(first:${first},${afterCursor &&
-            `after:"${afterCursor}"`} orderBy:{field:STARRED_AT,direction:ASC},){ pageInfo{ hasNextPage startCursor endCursor } nodes{ name url } totalCount } } }`,
+          query: `{ viewer { starredRepositories(first:${first},${
+            afterCursor && `after:"${afterCursor}"`
+          } orderBy:{field:STARRED_AT,direction:ASC},){ pageInfo{ hasNextPage startCursor endCursor } nodes{ name url } totalCount } } }`,
         }),
       });
 
@@ -159,17 +161,17 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
       if (i === allRepos.length - 1) {
         interactive.success(
           `Crawling page content No. [%s/%d]`,
-          `${
-            batchCount - batchSize <= 0 ? 1 : batchCount - batchSize
-          }-${batchCount - 1}`,
+          `${batchCount - batchSize <= 0 ? 1 : batchCount - batchSize}-${
+            batchCount - 1
+          }`,
           allRepos.length,
         );
       } else {
         interactive.await(
           `Crawling page content No. [%s/%d]`,
-          `${
-            batchCount - batchSize <= 0 ? 1 : batchCount - batchSize
-          }-${batchCount - 1}`,
+          `${batchCount - batchSize <= 0 ? 1 : batchCount - batchSize}-${
+            batchCount - 1
+          }`,
           allRepos.length,
         );
       }
@@ -183,10 +185,12 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
       //   }, '\n')}`,
       // );
       await Promise.all(
-        batchRepos.map(repo => {
-          return xRequestRetry(repo, repo.url, 'div.repository-content', [
-            { description: '.f4', readme: 'div.Box-body' },
-          ]);
+        batchRepos.map((repo) => {
+          return xRequestRetry(repo, repo.url, {
+            description:
+              '#js-repo-pjax-container > div.container-xl.clearfix.new-discussion-timeline.px-3.px-md-4.px-lg-5 > div > div.gutter-condensed.gutter-lg.flex-column.flex-md-row.d-flex > div.flex-shrink-0.col-12.col-md-3 > div > div.BorderGrid-row.hide-sm.hide-md > div > p',
+            readme: 'div.Box-body',
+          });
         }),
       );
       batchRepos = [];
