@@ -199,7 +199,6 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
                 readme: 'network error',
               });
             }
-
             const data = await crawlRepo(repo, ...args);
             allRepoPageContents.push(data);
           } catch (err) {

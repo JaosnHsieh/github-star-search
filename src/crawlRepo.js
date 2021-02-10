@@ -1,4 +1,4 @@
-const x = require('x-ray')().timeout(8000);
+const x = require('x-ray')().timeout(8000).delay('1s','3s').concurrency(5);
 
 const crawlerDomMatcher = {
   description:
@@ -8,6 +8,7 @@ const crawlerDomMatcher = {
 
 async function crawlRepo(repo, ...args) {
   let data = await x(...args);
+  
   dataPropTrimOrEmpty(data, 'readme');
   dataPropTrimOrEmpty(data, 'description');
   data = {
