@@ -1,6 +1,6 @@
 {
   "name": "@jasonhsieh/star-search",
-  "version": "0.0.23",
+  "version": "0.0.24",
   "description": "Search your star repositories on Github by text in README, description and repo name offline.",
   "homepage": "https://github.com/JaosnHsieh/github-star-search",
   "engines": {
