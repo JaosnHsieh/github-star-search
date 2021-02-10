@@ -8,9 +8,13 @@ const reposFilePath =
 const pageContetFilePath =
   process.env.PAGE_CONTENT_FILE_PATH ||
   path.join(__dirname, '..', 'pages.json');
+const errorRetryMs = 5000;
+const errorRetryTimes = 5;
 
 module.exports = {
   githubPersonalAccessToken,
   reposFilePath,
   pageContetFilePath,
+  errorRetryMs,
+  errorRetryTimes,
 };

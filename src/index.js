@@ -12,6 +12,8 @@ const {
   githubPersonalAccessToken,
   reposFilePath,
   pageContetFilePath,
+  errorRetryMs,
+  errorRetryTimes,
 } = require('./env');
 
 const starsearch = {
@@ -183,14 +185,13 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
       batchRepos = [];
 
       async function xRequestRetry(repo, ...args) {
-        let retryNumbers = 5;
         let retryCount = 1;
 
         await xRequest();
 
         async function xRequest() {
           try {
-            if (retryCount >= retryNumbers) {
+            if (retryCount >= errorRetryTimes) {
               return allRepoPageContents.push({
                 url: repo.url,
                 name: repo.name,
@@ -202,11 +203,12 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
             const data = await crawlRepo(repo, ...args);
             allRepoPageContents.push(data);
           } catch (err) {
-            console.log(err);
-            await wait(2000);
             ++retryCount;
-            if (retryCount < retryNumbers) {
-              signale.info(`network error, trying...${retryCount}`);
+            if (retryCount < errorRetryTimes) {
+              signale.info(
+                `network error, retrying... retryCount ${retryCount}`,
+              );
+              await wait(errorRetryMs);
               await xRequest(...args);
             }
           }
