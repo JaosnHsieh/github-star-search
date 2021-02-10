@@ -4,9 +4,9 @@ const path = require('path');
 const fetch = require('isomorphic-fetch');
 const _get = require('lodash.get');
 const { Signale } = require('signale');
+const { crawlRepo, crawlerDomMatcher } = require('./crawlRepo');
 const signale = new Signale({ scope: 'star-search' });
 const interactive = new Signale({ interactive: true, scope: 'star-search' });
-const x = require('x-ray')().timeout(8000);
 const search = require('./search');
 const {
   githubPersonalAccessToken,
@@ -175,22 +175,9 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
           allRepos.length,
         );
       }
-
-      // console.log(
-      //   `Crawling page content No.${
-      //     batchCount - batchSize <= 0 ? 1 : batchCount - batchSize
-      //   }-${batchCount - 1}  ${batchRepos.reduce((accu, repo) => {
-      //     accu += `${repo.name} ${repo.url}\n`;
-      //     return accu;
-      //   }, '\n')}`,
-      // );
       await Promise.all(
         batchRepos.map((repo) => {
-          return xRequestRetry(repo, repo.url, {
-            description:
-              '#js-repo-pjax-container > div.container-xl.clearfix.new-discussion-timeline.px-3.px-md-4.px-lg-5 > div > div.gutter-condensed.gutter-lg.flex-column.flex-md-row.d-flex > div.flex-shrink-0.col-12.col-md-3 > div > div.BorderGrid-row.hide-sm.hide-md > div > p',
-            readme: 'div.Box-body',
-          });
+          return xRequestRetry(repo, repo.url, crawlerDomMatcher);
         }),
       );
       batchRepos = [];
@@ -212,20 +199,7 @@ async function readFromFileAndParseToReadme(filePath, pageContetFilePath) {
               });
             }
 
-            let data = await x(...args);
-            dataPropTrimOrEmpty(data, 'readme');
-            dataPropTrimOrEmpty(data, 'description');
-            function dataPropTrimOrEmpty(data = {}, propName = '') {
-              data && data[propName] && typeof data[propName] === 'string'
-                ? (data[propName] = data[propName].replace(/\n/gi, ' '))
-                : (data[propName] = '');
-            }
-
-            data = {
-              ...data,
-              url: repo.url,
-              name: repo.name,
-            };
+            const data = await crawlRepo(repo, ...args);
             allRepoPageContents.push(data);
           } catch (err) {
             console.log(err);
