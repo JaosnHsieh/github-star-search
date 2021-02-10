@@ -1,6 +1,6 @@
 {
   "name": "@jasonhsieh/star-search",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "description": "Search your star repositories on Github by text in README, description and repo name offline.",
   "homepage": "https://github.com/JaosnHsieh/github-star-search",
   "engines": {
@@ -8,7 +8,6 @@
   },
   "main": "index.js",
   "bin": {
-    "@jasonhsieh/star-search": "bin/star-search.js",
     "star-search": "bin/star-search.js"
   },
   "publishConfig": {
@@ -19,7 +18,8 @@
     "src/"
   ],
   "scripts": {
-    "start": "node ./src/index.js"
+    "start": "node ./src/index.js",
+    "test": "node ./src/test.js"
   },
   "keywords": [
     "github",
@@ -31,7 +31,7 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^8.1.0",
-    "isomorphic-fetch": "^2.2.1",
+    "isomorphic-fetch": "^3.0.0",
     "js-fire": "^0.7.3",
     "js-search": "^2.0.0",
     "lodash.chunk": "^4.2.0",
