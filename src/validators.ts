@@ -1,9 +1,9 @@
-import Ajv from "ajv";
-import ajvErrors from "ajv-errors";
-import ApiResponseSchema from "./schema/ApiResponse.json";
-import ConfigResponseSchema from "./schema/Config.json";
-import ReadmeRepoSchema from "./schema/ReadmeRepo.json";
-import ReadmeReposSchema from "./schema/ReadmeRepos.json";
+import Ajv from 'ajv';
+import ajvErrors from 'ajv-errors';
+import ApiResponseSchema from './schema/ApiResponse.json';
+import ConfigResponseSchema from './schema/Config.json';
+import ReadmeRepoSchema from './schema/ReadmeRepo.json';
+import ReadmeReposSchema from './schema/ReadmeRepos.json';
 
 const ajv = new Ajv({ allErrors: true, useDefaults: true });
 ajvErrors(ajv, { singleError: false });

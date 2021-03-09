@@ -1,1 +1,1 @@
-export type DataFileName = "readmeRepos.json" | "config.json";
+export type DataFileName = 'readmeRepos.json' | 'config.json';

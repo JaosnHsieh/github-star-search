@@ -1,4 +1,4 @@
-import { StarRepo } from "./Repo";
+import { StarRepo } from './Repo';
 /**
        * sample response data
        * {
@@ -28,26 +28,26 @@ import { StarRepo } from "./Repo";
        */
 
 export interface ApiResponse {
-	message?: string;
-	data: {
-		viewer: {
-			starredRepositories: {
-				pageInfo: {
-					hasNextPage: boolean;
-					/**
-					 * @default ""
-					 * @nullable
-					 */
-					startCursor: string;
-					/**
-					 * @default ""
-					 * @nullable
-					 */
-					endCursor: string;
-				};
-				nodes: StarRepo[];
-				totalCount: number;
-			};
-		};
-	};
+    message?: string;
+    data: {
+        viewer: {
+            starredRepositories: {
+                pageInfo: {
+                    hasNextPage: boolean;
+                    /**
+                     * @default ""
+                     * @nullable
+                     */
+                    startCursor: string;
+                    /**
+                     * @default ""
+                     * @nullable
+                     */
+                    endCursor: string;
+                };
+                nodes: StarRepo[];
+                totalCount: number;
+            };
+        };
+    };
 }
