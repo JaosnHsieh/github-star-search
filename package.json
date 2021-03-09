@@ -1,43 +1,72 @@
 {
-  "name": "@jasonhsieh/star-search",
-  "version": "0.0.24",
-  "description": "Search your star repositories on Github by text in README, description and repo name offline.",
-  "homepage": "https://github.com/JaosnHsieh/github-star-search",
-  "engines": {
-    "node": ">=8.0.0"
-  },
-  "main": "index.js",
-  "bin": {
-    "star-search": "bin/star-search.js"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "files": [
-    "bin/",
-    "src/"
-  ],
-  "scripts": {
-    "start": "node ./src/index.js",
-    "test": "node ./src/test.js"
-  },
-  "keywords": [
-    "github",
-    "search",
-    "stars",
-    "cli"
-  ],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "dotenv": "^8.1.0",
-    "isomorphic-fetch": "^3.0.0",
-    "js-fire": "^0.7.3",
-    "js-search": "^2.0.0",
-    "lodash.chunk": "^4.2.0",
-    "lodash.get": "^4.4.2",
-    "porter-stemmer": "^0.9.1",
-    "signale": "^1.4.0",
-    "x-ray": "^2.3.4"
-  }
+	"name": "@jasonhsieh/star-search",
+	"version": "1.0.0",
+	"license": "MIT",
+	"description": "Search your star repositories on Github by text in README, description and repo name offline.",
+	"main": "dist/main.js",
+	"bin": {
+		"github-star-search": "./bin/main.js",
+		"star-search": "./bin/main.js"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"files": [
+		"dist/"
+	],
+	"engines": {
+		"node": ">=8.0.0"
+	},
+	"keywords": [
+		"github",
+		"search",
+		"stars",
+		"cli"
+	],
+	"author": "jh",
+	"scripts": {
+		"prepublish":"rm -rf ./dist && yarn build",
+		"build": "tsc",
+		"start": "npm run build && dist/main.js",
+		"start:dev": "ts-node ./src/main.ts",
+		"pretest": "npm run build",
+		"test": "ts-node ./src/api/repo.test.ts",
+		"gen-schema": "npm run gen-schema1 && npm run gen-schema2 &&npm run gen-schema3 && npm run  gen-schema4",
+		"gen-schema1": "typescript-json-schema './src/types/Repo.d.ts' 'ReadmeRepos' > './src/schema/ReadmeRepos.json'",
+		"gen-schema2": "typescript-json-schema './src/types/Repo.d.ts' 'ReadmeRepo' > './src/schema/ReadmeRepo.json'",
+		"gen-schema3": "typescript-json-schema './src/types/ApiResponse.d.ts' 'ApiResponse' > './src/schema/ApiResponse.json'",
+		"gen-schema4": "typescript-json-schema './src/types/Config.d.ts' 'Config' > './src/schema/Config.json'"
+	},
+	"dependencies": {
+		"@types/lodash.debounce": "^4.0.6",
+		"@types/x-ray": "^2.3.3",
+		"ajv": "^7.2.1",
+		"ajv-errors": "^2.0.0",
+		"cross-fetch": "^3.0.6",
+		"fuse.js": "^6.4.6",
+		"ink": "^3.0.8",
+		"ink-text-input": "^4.0.1",
+		"lodash.chunk": "^4.2.0",
+		"lodash.debounce": "^4.0.8",
+		"lodash.throttle": "^4.1.1",
+		"mobx": "^6.1.8",
+		"mobx-react-lite": "^3.2.0",
+		"react": "^17.0.1",
+		"react-dom": "^17.0.1",
+		"x-ray": "^2.3.4"
+	},
+	"devDependencies": {
+		"@types/lodash.chunk": "^4.2.6",
+		"@types/lodash.escaperegexp": "^4.1.6",
+		"@types/lodash.throttle": "^4.1.6",
+		"@types/react": "^17.0.2",
+		"chalk": "^4.1.0",
+		"eslint-config-xo-react": "^0.24.0",
+		"eslint-plugin-react": "^7.22.0",
+		"eslint-plugin-react-hooks": "^4.2.0",
+		"ink-testing-library": "^2.1.0",
+		"ts-node": "^9.1.1",
+		"typescript": "^4.2.2",
+		"typescript-json-schema": "^0.49.0"
+	}
 }

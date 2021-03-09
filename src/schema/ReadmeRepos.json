@@ -1,0 +1,46 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "ReadmeRepo": {
+            "properties": {
+                "description": {
+                    "anyOf": [
+                        {
+                            "default": "",
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "homepageUrl": {
+                    "anyOf": [
+                        {
+                            "default": "",
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "name": {
+                    "type": "string"
+                },
+                "readme": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "items": {
+        "$ref": "#/definitions/ReadmeRepo"
+    },
+    "type": "array"
+}
+

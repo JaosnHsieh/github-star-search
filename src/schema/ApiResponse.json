@@ -1,0 +1,100 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "StarRepo": {
+            "properties": {
+                "description": {
+                    "anyOf": [
+                        {
+                            "default": "",
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "homepageUrl": {
+                    "anyOf": [
+                        {
+                            "default": "",
+                            "type": "string"
+                        },
+                        {
+                            "type": "null"
+                        }
+                    ]
+                },
+                "name": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "description": "sample response data\n{\n \"data\": {\n   \"viewer\": {\n     \"starredRepositories\": {\n       \"pageInfo\": {\n         \"hasNextPage\": true,\n         \"startCursor\": \"Y3Vyc29yOnYyOpK5MjAxNi0wNy0wMVQxODo1NTowNSswODowMM4DuIeg\",\n         \"endCursor\": \"Y3Vyc29yOnYyOpK5MjAxNi0wOC0xOFQxNzowMDowOCswODowMM4D7bX2\"\n       },\n       \"nodes\": [\n         {\n           \"name\": \"freeCodeCamp\",\n           \"url\": \"https://github.com/freeCodeCamp/freeCodeCamp\"\n         },\n         {\n           \"name\": \"node-uglifier\",\n           \"url\": \"https://github.com/zsoltszabo/node-uglifier\"\n         }\n       ],\n       \"totalCount\": 1026\n     }\n   }\n }\n}",
+    "properties": {
+        "data": {
+            "properties": {
+                "viewer": {
+                    "properties": {
+                        "starredRepositories": {
+                            "properties": {
+                                "nodes": {
+                                    "items": {
+                                        "$ref": "#/definitions/StarRepo"
+                                    },
+                                    "type": "array"
+                                },
+                                "pageInfo": {
+                                    "properties": {
+                                        "endCursor": {
+                                            "anyOf": [
+                                                {
+                                                    "default": "",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "type": "null"
+                                                }
+                                            ]
+                                        },
+                                        "hasNextPage": {
+                                            "type": "boolean"
+                                        },
+                                        "startCursor": {
+                                            "anyOf": [
+                                                {
+                                                    "default": "",
+                                                    "type": "string"
+                                                },
+                                                {
+                                                    "type": "null"
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "type": "object"
+                                },
+                                "totalCount": {
+                                    "type": "number"
+                                }
+                            },
+                            "type": "object"
+                        }
+                    },
+                    "type": "object"
+                }
+            },
+            "type": "object"
+        },
+        "message": {
+            "type": "string"
+        }
+    },
+    "type": "object"
+}
+

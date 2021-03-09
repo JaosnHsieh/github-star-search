@@ -1,0 +1,21 @@
+{
+	"compilerOptions": {
+	  "target": "es2017",
+	  "module": "commonjs",
+	  "lib": ["ES2017"],
+	  "outDir": "./dist",
+	  "rootDir": "src",
+	  "strict": true,
+	  "jsx": "react",
+	  "strictNullChecks": true,
+	  "declaration": true,
+	  "sourceMap": true,
+	  "noImplicitReturns": true,
+	  "noFallthroughCasesInSwitch": true,
+	  "esModuleInterop": true,
+	  "skipLibCheck": true,
+	  "resolveJsonModule": true,
+	},
+	"include": ["src"],
+	"exclude": ["node_modules", "**/*.spec.ts"]
+  }
