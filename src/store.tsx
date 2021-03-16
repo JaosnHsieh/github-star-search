@@ -117,7 +117,6 @@ class Store {
     }
     async updateRepos() {
         try {
-            this.fetchStatus = 'pending';
             const { allRepos: staredRepos, endBatchCursor } = await api.getAllStaredRepos({
                 token: this.configStore.token,
                 progressCb: (current, total, firstRepoName) => {
@@ -142,9 +141,7 @@ class Store {
 
             this.configStore.setLastFetchedAt();
             this.configStore.stLastFetchedCursor(endBatchCursor);
-            this.fetchStatus = 'rejected';
         } catch (err) {
-            this.fetchStatus = 'rejected';
             if (err.message === api.wrongTokenErrorMsg) {
                 store.setStatus(`github token is invalid`);
                 this.configStore.setToken('');
