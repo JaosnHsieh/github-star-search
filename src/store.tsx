@@ -1,12 +1,12 @@
 import { createContext } from 'react';
 import { makeAutoObservable, autorun, configure } from 'mobx';
 import throttle from 'lodash.throttle';
-import escaperegexp from 'lodash.escaperegexp';
 import Fuse from 'fuse.js';
 import * as api from './api/repo';
 import { ReadmeRepo } from './types/Repo';
 import config from './data/config.json';
 import readmeRepos from './data/readmeRepos.json';
+import { getExactMatchStrs, getNotExactMatchStr, getExactMatchRepos } from './utils';
 
 type CurrentScreen = 'search' | 'token' | 'status';
 
@@ -48,19 +48,16 @@ class Store {
         if (trimmedKeyword.length === 0) {
             return this.readmeRepos;
         }
-        if (trimmedKeyword[0] === '"' && trimmedKeyword[trimmedKeyword.length - 1] === '"') {
-            const keywordWithoutQuotes = trimmedKeyword.slice(1, trimmedKeyword.length - 1);
-            const keywordRegex = new RegExp(escaperegexp(keywordWithoutQuotes), 'gi');
-            return this.readmeRepos.filter((repo) => {
-                const isMatchedOne = Object.entries(repo).some(([_, text]) =>
-                    keywordRegex.test(text),
-                );
-                return isMatchedOne;
-            });
-        }
-
-        if (this.fuse) {
-            return this.fuse.search(trimmedKeyword).map((i) => i.item);
+        const exactMatchStrs = getExactMatchStrs(trimmedKeyword);
+        const notExactMatchStr = getNotExactMatchStr(trimmedKeyword);
+        if (this.fuse && notExactMatchStr.length > 0) {
+            const result = this.fuse.search(notExactMatchStr).map((i) => i.item);
+            if (exactMatchStrs.length > 0) {
+                return getExactMatchRepos(exactMatchStrs, result);
+            }
+            return result;
+        } else if (exactMatchStrs.length > 0) {
+            return getExactMatchRepos(exactMatchStrs, this.readmeRepos);
         }
 
         return [];

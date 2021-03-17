@@ -17,7 +17,7 @@ star-search
 
 -   Search through `readme` and `url`, `homepageUrl`, `name`, `description` text offline.
 
--   Fuzzy search by [fuse.js](https://fusejs.io/). Exact match by adding double quote `"` like `"express.js"`.
+-   Fuzzy search by [fuse.js](https://fusejs.io/). Exact match by adding double quote `"` such as `"express.js"`, or multiple `minimalist "express" "web framework for node"`.
 
 -   Check new starred repos and update at most once daily while running
 

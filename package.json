@@ -1,6 +1,6 @@
 {
     "name": "@jasonhsieh/star-search",
-    "version": "1.1.1",
+    "version": "1.1.2",
     "license": "MIT",
     "description": "Search your star repositories on Github by text in README, description and repo name offline.",
     "bin": {
@@ -35,7 +35,7 @@
         "start:dev": "ts-node ./src/main.ts",
         "pretest": "npm run build",
         "format": "prettier --write '**/*.{ts,json,md,tsx}'",
-        "test": "ts-node ./src/api/repo.test.ts",
+        "test": "ts-node ./src/api/repo.test.ts && ts-node ./src/utils.test.ts",
         "gen-schema": "npm run gen-schema1 && npm run gen-schema2 &&npm run gen-schema3 && npm run  gen-schema4",
         "gen-schema1": "typescript-json-schema './src/types/Repo.d.ts' 'ReadmeRepos' > './src/schema/ReadmeRepos.json'",
         "gen-schema2": "typescript-json-schema './src/types/Repo.d.ts' 'ReadmeRepo' > './src/schema/ReadmeRepo.json'",
