@@ -33,4 +33,44 @@ MIT
 
 ## Credits
 
-interactive UI mostly direct from [wiki-cil](https://github.com/hexrcs/wiki-cli)
+[wiki-cil](https://github.com/hexrcs/wiki-cli) - interactive UI style
+
+[ink](https://github.com/vadimdemedes/ink) - awesome React cli renderer
+
+and more....
+
+```
+	"@types/lodash.debounce": "^4.0.6",
+	"@types/x-ray": "^2.3.3",
+	"ajv": "^7.2.1",
+	"ajv-errors": "^2.0.0",
+	"cross-fetch": "^3.0.6",
+	"fuse.js": "^6.4.6",
+	"ink": "^3.0.8",
+	"ink-text-input": "^4.0.1",
+	"lodash.chunk": "^4.2.0",
+	"lodash.debounce": "^4.0.8",
+	"lodash.escaperegexp": "^4.1.2",
+	"lodash.throttle": "^4.1.1",
+	"mobx": "^6.1.8",
+	"mobx-react-lite": "^3.2.0",
+	"open": "^8.0.2",
+	"react": "^17.0.1",
+	"react-dom": "^17.0.1",
+	"x-ray": "^2.3.4"
+	"@types/lodash.chunk": "^4.2.6",
+	"@types/lodash.escaperegexp": "^4.1.6",
+	"@types/lodash.throttle": "^4.1.6",
+	"@types/react": "^17.0.2",
+	"chalk": "^4.1.0",
+	"eslint-config-xo-react": "^0.24.0",
+	"eslint-plugin-react": "^7.22.0",
+	"eslint-plugin-react-hooks": "^4.2.0",
+	"ink-testing-library": "^2.1.0",
+	"prettier": "^2.2.1",
+	"prettier-quick": "^0.0.5",
+	"ts-node": "^9.1.1",
+	"typescript": "^4.2.2",
+	"typescript-json-schema": "^0.49.0"
+
+```
