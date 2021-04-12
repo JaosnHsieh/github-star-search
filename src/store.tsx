@@ -134,6 +134,9 @@ class Store {
                 store.setReadmeRepos(concatedRepos);
                 api.saveReadmeRepos(concatedRepos);
                 this.createFuseIndex();
+                setTimeout(() => {
+                    store.setStatus('');
+                }, 5000);
             }
 
             this.configStore.setLastFetchedAt();
